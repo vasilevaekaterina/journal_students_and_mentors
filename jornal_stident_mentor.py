@@ -1,7 +1,17 @@
 import statistics
 
 
-class Student:
+class GraderMixin:
+    def middle_score(self):
+        all_grades = []
+        for grades in self.grades.values():
+            all_grades.extend(grades)
+        if all_grades:
+            return statistics.mean(all_grades)
+        return 0
+
+
+class Student (GraderMixin):
     def __init__(self, name, surname, gender):
         self.name = name
         self.surname = surname
@@ -13,7 +23,7 @@ class Student:
     def add_courses(self, course_name):
         self.finished_courses.append(course_name)
 
-    def сourse_assessment(self, lecture, course, grade):
+    def rate_lecturer(self, lecture, course, grade):
         if isinstance(lecture, Lecturer) and ((course in
                                               lecture.courses_attached)
                                               and (course in
@@ -25,38 +35,37 @@ class Student:
         else:
             return 'Ошибка'
 
-    def middle_score(self):
-        all_grades = []
-        for grades in self.grades.values():
-            all_grades.extend(grades)
-        if all_grades:
-            return statistics.mean(all_grades)
-        return 0
 
     def __lt__(self, other):
-        return self.middle_score() < other.middle_score()
+        if isinstance(other, Student):
+            return self.middle_score() < other.middle_score()
 
     def __le__(self, other):
-        return self.middle_score() <= other.middle_score()
+        if isinstance(other, Student):
+            return self.middle_score() <= other.middle_score()
 
     def __gt__(self, other):
-        return self.middle_score() > other.middle_score()
+        if isinstance(other, Student):
+            return self.middle_score() > other.middle_score()
 
     def __ge__(self, other):
-        return self.middle_score() >= other.middle_score()
+        if isinstance(other, Student):
+            return self.middle_score() >= other.middle_score()
 
     def __eq__(self, other):
-        return self.middle_score() == other.middle_score()
+        if isinstance(other, Student):
+            return self.middle_score() == other.middle_score()
 
     def __ne__(self, other):
-        return self.middle_score() != other.middle_score()
+        if isinstance(other, Student):
+            return self.middle_score() != other.middle_score()
 
     def __str__(self):
         return (f'Имя: {self.name}\n'
                 f'Фамилия: {self.surname}\n'
-                f'Средняя оценка за лекции: {self.middle_score()}\n'
-                f'Курсы в процессе изучения: {self.courses_in_progress}\n'
-                f'Завершенные курсы: {self.finished_courses}')
+                f'Средняя оценка за домашние задания: {self.middle_score()}\n'
+                f'Курсы в процессе изучения: {", ".join(self.courses_in_progress)}\n'
+                f'Завершенные курсы: {", ".join(self.finished_courses)}')
 
 
 class Mentor:
@@ -66,36 +75,34 @@ class Mentor:
         self.courses_attached = []
 
 
-class Lecturer(Mentor):
+class Lecturer(Mentor, GraderMixin):
     def __init__(self, name, surname):
         super().__init__(name, surname)
         self.grades = {}
 
-    def middle_score(self):
-        all_grades = []
-        for grades in self.grades.values():
-            all_grades.extend(grades)
-        if all_grades:
-            return statistics.mean(all_grades)
-        return 0
-
     def __lt__(self, other):
-        return self.middle_score() < other.middle_score()
+        if isinstance(other, Lecturer):
+            return self.middle_score() < other.middle_score()
 
     def __le__(self, other):
-        return self.middle_score() <= other.middle_score()
+        if isinstance(other, Lecturer):
+            return self.middle_score() <= other.middle_score()
 
     def __gt__(self, other):
-        return self.middle_score() > other.middle_score()
+        if isinstance(other, Lecturer):
+            return self.middle_score() > other.middle_score()
 
     def __ge__(self, other):
-        return self.middle_score() >= other.middle_score()
+        if isinstance(other, Lecturer):
+            return self.middle_score() >= other.middle_score()
 
     def __eq__(self, other):
-        return self.middle_score() == other.middle_score()
+        if isinstance(other, Lecturer):
+            return self.middle_score() == other.middle_score()
 
     def __ne__(self, other):
-        return self.middle_score() != other.middle_score()
+        if isinstance(other, Lecturer):
+            return self.middle_score() != other.middle_score()
 
     def __str__(self):
         return (f'Имя: {self.name}\n'
@@ -165,12 +172,12 @@ reviewer_1.rate_hw(best_student, 'Python', 10)
 reviewer_1.rate_hw(another_student, 'Python', 9)
 reviewer_1.rate_hw(another_student, 'Python', 8)
 
-best_student.сourse_assessment(lecture_1, 'Python', 10)
-best_student.сourse_assessment(lecture_1, 'Git', 9)
-best_student.сourse_assessment(lecture_1, 'Введение в програмирование', 10)
+best_student.rate_lecturer(lecture_1, 'Python', 10)
+best_student.rate_lecturer(lecture_1, 'Git', 9)
+best_student.rate_lecturer(lecture_1, 'Введение в програмирование', 10)
 
-another_student.сourse_assessment(lecture_2, 'Python', 8)
-another_student.сourse_assessment(lecture_2, 'Введение в програмирование', 8)
+another_student.rate_lecturer(lecture_2, 'Python', 8)
+another_student.rate_lecturer(lecture_2, 'Введение в програмирование', 8)
 
 print(best_student)
 print(another_student)
